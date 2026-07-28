@@ -1,15 +1,15 @@
 body{
     margin:0;
     padding:0;
-    font-family:Arial, Helvetica, sans-serif;
-    background:#f4f4f4;
+    background:#f2f2f2;
+    font-family:Arial,sans-serif;
 }
 
 .container{
-    max-width:400px;
+    max-width:500px;
     margin:40px auto;
     text-align:center;
-    background:white;
+    background:#fff;
     padding:20px;
     border-radius:15px;
     box-shadow:0 0 10px rgba(0,0,0,.2);
@@ -19,51 +19,35 @@ h1{
     color:#1565C0;
 }
 
+input{
+    margin:20px;
+}
+
 button{
-    width:120px;
+    width:140px;
     padding:12px;
     margin:10px;
     border:none;
     border-radius:8px;
-    font-size:16px;
+    font-size:18px;
     cursor:pointer;
+    color:#fff;
 }
 
 #play{
     background:#2ecc71;
-    color:white;
 }
 
 #pause{
     background:#e74c3c;
-    color:white;
 }
-
-input{
-    margin:20px;
-} 
 
 #remover{
-    width:180px;
-    padding:12px;
-    margin:10px auto;
-    display:block;
     background:#1565C0;
-    color:white;
-    border:none;
-    border-radius:10px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.3s;
-}
-
-#remover:hover{
-    background:#0D47A1;
 }
 
 #status{
-    margin-top:15px;
-    color:#555;
+    margin-top:20px;
     font-weight:bold;
+    color:#555;
 }
