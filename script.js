@@ -24,3 +24,16 @@ document.getElementById("pause").addEventListener("click", () => {
 document.getElementById("remover").addEventListener("click", () => {
     status.textContent = "Status: Em breve teremos IA para remover a voz.";
 });
+
+// Registrar o Service Worker
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .then(() => {
+        console.log("Service Worker registrado com sucesso.");
+      })
+      .catch((erro) => {
+        console.log("Erro ao registrar Service Worker:", erro);
+      });
+  });
+}
