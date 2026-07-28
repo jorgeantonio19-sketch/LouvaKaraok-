@@ -1,44 +1,26 @@
 const arquivo = document.getElementById("arquivo");
 const player = document.getElementById("player");
 const nomeMusica = document.getElementById("nomeMusica");
-
-arquivo.addEventListener("change", function(){
-
-    const musica = this.files[0];
-
-    if(musica){
-
-        nomeMusica.innerText = musica.name;
-
-        player.src = URL.createObjectURL(musica);
-
-    }
-
-});
-
-document.getElementById("play").addEventListener("click", ()=>{
-
-    player.play();
-
-});
-
-document.getElementById("pause").addEventListener("click", ()=>{
-
-    player.pause();
-
-});
-
-const remover = document.getElementById("remover");
 const status = document.getElementById("status");
 
-remover.addEventListener("click", () => {
+arquivo.addEventListener("change", function () {
+    const musica = this.files[0];
 
-    status.innerText = "Status: Processando...";
+    if (!musica) return;
 
-    setTimeout(() => {
+    nomeMusica.textContent = musica.name;
+    player.src = URL.createObjectURL(musica);
+    status.textContent = "Status: Música carregada.";
+});
 
-        status.innerText = "Status: IA ainda não implementada.";
+document.getElementById("play").addEventListener("click", () => {
+    player.play();
+});
 
-    }, 2000);
+document.getElementById("pause").addEventListener("click", () => {
+    player.pause();
+});
 
+document.getElementById("remover").addEventListener("click", () => {
+    status.textContent = "Status: Em breve teremos IA para remover a voz.";
 });
