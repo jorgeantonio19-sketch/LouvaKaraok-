@@ -1,39 +1,44 @@
 const arquivo = document.getElementById("arquivo");
 const player = document.getElementById("player");
 const nomeMusica = document.getElementById("nomeMusica");
-const status = document.getElementById("status");
 
-arquivo.addEventListener("change", function () {
+arquivo.addEventListener("change", function(){
+
     const musica = this.files[0];
 
-    if (!musica) return;
+    if(musica){
 
-    nomeMusica.textContent = musica.name;
-    player.src = URL.createObjectURL(musica);
-    status.textContent = "Status: Música carregada.";
+        nomeMusica.innerText = musica.name;
+
+        player.src = URL.createObjectURL(musica);
+
+    }
+
 });
 
-document.getElementById("play").addEventListener("click", () => {
+document.getElementById("play").addEventListener("click", ()=>{
+
     player.play();
+
 });
 
-document.getElementById("pause").addEventListener("click", () => {
+document.getElementById("pause").addEventListener("click", ()=>{
+
     player.pause();
+
 });
 
-document.getElementById("remover").addEventListener("click", () => {
-    status.textContent = "Status: Em breve teremos IA para remover a voz.";
-});
+const remover = document.getElementById("remover");
+const status = document.getElementById("status");
 
-// Registrar o Service Worker
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js")
-      .then(() => {
-        console.log("Service Worker registrado com sucesso.");
-      })
-      .catch((erro) => {
-        console.log("Erro ao registrar Service Worker:", erro);
-      });
-  });
-}
+remover.addEventListener("click", () => {
+
+    status.innerText = "Status: Processando...";
+
+    setTimeout(() => {
+
+        status.innerText = "Status: IA ainda não implementada.";
+
+    }, 2000);
+
+});
