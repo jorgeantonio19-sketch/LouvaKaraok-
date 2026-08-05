@@ -17,7 +17,7 @@
         Nenhuma música selecionada
     </p>
 
-    <audio id="player" controls></audio>
+    <video id="player" controls playsinline></video>
 
     <button id="play">▶ Play</button>
     <button id="pause">⏸ Pause</button>
@@ -34,6 +34,17 @@
     </div>
 
     <a id="download" style="display:none">⬇ Baixar sem voz</a>
+
+    <hr>
+
+    <h3>🎤 Cantar Junto</h3>
+    <p class="dica">Dica: usa fones de ouvido, senão a música vai pegar no microfone junto com tua voz.</p>
+
+    <button id="gravar">🔴 Gravar minha voz</button>
+    <button id="pararGravacao" disabled>⏹ Parar Gravação</button>
+
+    <audio id="playerGravacao" controls style="display:none;"></audio>
+    <a id="baixarGravacao" style="display:none">⬇ Baixar minha gravação</a>
 
 <p id="status">Status: Pronto.</p></div>
 

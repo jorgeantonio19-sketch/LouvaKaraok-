@@ -8,6 +8,10 @@ const sliderIntensidade = document.getElementById("intensidade");
 const sliderGraves = document.getElementById("graves");
 const valorIntensidade = document.getElementById("valorIntensidade");
 const valorGraves = document.getElementById("valorGraves");
+const btnGravar = document.getElementById("gravar");
+const btnPararGravacao = document.getElementById("pararGravacao");
+const playerGravacao = document.getElementById("playerGravacao");
+const btnBaixarGravacao = document.getElementById("baixarGravacao");
 
 const AudioContextRef = window.AudioContext || window.webkitAudioContext;
 
@@ -15,6 +19,11 @@ let arrayBufferOriginal = null;
 let urlOriginal = null;
 let audioCtx = null;
 let grafo = null; // referências aos nós do grafo, pra mexer ao vivo
+
+let micStream = null;
+let mediaRecorder = null;
+let chunksGravados = [];
+let urlGravacao = null;
 
 arquivo.addEventListener("change", async function () {
     const musica = this.files[0];
@@ -142,6 +151,76 @@ btnDownload.addEventListener("click", async (ev) => {
         console.error(erro);
         status.innerText = "Status: Erro ao gerar o download.";
     }
+});
+
+btnGravar.addEventListener("click", async () => {
+    if (!grafo) {
+        status.innerText = "Status: Clica em 'Ativar Efeito' primeiro (precisa estar tocando pela Web Audio).";
+        return;
+    }
+
+    try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (erro) {
+        console.error(erro);
+        status.innerText = "Status: Não consegui acessar o microfone (permissão negada?).";
+        return;
+    }
+
+    // Mistura a trilha já processada (grafo.saida) com a tua voz num único destino de gravação
+    const destinoGravacao = audioCtx.createMediaStreamDestination();
+    grafo.saida.connect(destinoGravacao);
+
+    const micSource = audioCtx.createMediaStreamSource(micStream);
+    micSource.connect(destinoGravacao);
+
+    let mimeType = "";
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported("audio/mp4")) {
+        mimeType = "audio/mp4";
+    } else if (window.MediaRecorder && MediaRecorder.isTypeSupported("audio/webm")) {
+        mimeType = "audio/webm";
+    }
+
+    chunksGravados = [];
+    mediaRecorder = mimeType
+        ? new MediaRecorder(destinoGravacao.stream, { mimeType })
+        : new MediaRecorder(destinoGravacao.stream);
+
+    mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunksGravados.push(e.data);
+    };
+
+    mediaRecorder.onstop = () => {
+        if (urlGravacao) URL.revokeObjectURL(urlGravacao);
+
+        const tipoFinal = mimeType || "audio/webm";
+        const blobGravacao = new Blob(chunksGravados, { type: tipoFinal });
+        urlGravacao = URL.createObjectURL(blobGravacao);
+
+        playerGravacao.src = urlGravacao;
+        playerGravacao.style.display = "block";
+
+        const extensao = tipoFinal.includes("mp4") ? "m4a" : "webm";
+        btnBaixarGravacao.href = urlGravacao;
+        btnBaixarGravacao.download = "minha-gravacao." + extensao;
+        btnBaixarGravacao.style.display = "block";
+
+        micStream.getTracks().forEach((t) => t.stop());
+        status.innerText = "Status: Gravação pronta! Escuta ou baixa aí embaixo.";
+    };
+
+    mediaRecorder.start();
+    btnGravar.disabled = true;
+    btnPararGravacao.disabled = false;
+    status.innerText = "Status: 🔴 Gravando... canta à vontade!";
+});
+
+btnPararGravacao.addEventListener("click", () => {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+    }
+    btnGravar.disabled = false;
+    btnPararGravacao.disabled = true;
 });
 
 // Monta o grafo de áudio: separa L e R, cancela o centro (L - R),
