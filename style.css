@@ -1,8 +1,13 @@
+*, *::before, *::after{
+    box-sizing:border-box;
+}
+
 body{
     margin:0;
     padding:0;
     font-family:Arial, Helvetica, sans-serif;
     background:#f4f4f4;
+    overflow-x:hidden;
 }
 
 .container{
@@ -86,6 +91,7 @@ audio{
 
 .controle input[type="range"]{
     width:100%;
+    touch-action:none;
 }
 
 .controle input[type="range"]:disabled{
