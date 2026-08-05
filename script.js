@@ -84,6 +84,7 @@ sliderIntensidade.addEventListener("input", () => {
     if (grafo) {
         grafo.wetGain.gain.value = intensidade;
         grafo.dryHighGain.gain.value = 1 - intensidade;
+        grafo.saida.gain.value = 1 + intensidade * 0.6;
     }
 });
 
@@ -123,6 +124,8 @@ btnDownload.addEventListener("click", async (ev) => {
 
         fonteOffline.start(0);
         const bufferRenderizado = await offlineCtx.startRendering();
+
+        normalizarPico(bufferRenderizado, 0.95);
 
         const blobWav = paraWavEstereo(bufferRenderizado);
         const urlDownload = URL.createObjectURL(blobWav);
@@ -183,12 +186,41 @@ function construirGrafo(ctx, source, intensidadeInicial, corteInicial) {
     dryLowpass.frequency.value = corteInicial;
     source.connect(dryLowpass);
 
-    const saida = ctx.createGain();
-    wetGain.connect(saida);
-    dryHighGain.connect(saida);
-    dryLowpass.connect(saida);
+    const mixSaida = ctx.createGain();
+    wetGain.connect(mixSaida);
+    dryHighGain.connect(mixSaida);
+    dryLowpass.connect(mixSaida);
 
-    return { saida, wetGain, dryHighGain, dryLowpass, wetHighpass, dryHighpass };
+    // Compensação de volume: quanto mais voz é cancelada, mais energia se perde,
+    // então reforçamos o ganho de saída proporcionalmente à intensidade.
+    const saida = ctx.createGain();
+    saida.gain.value = 1 + intensidadeInicial * 0.6;
+    mixSaida.connect(saida);
+
+    return { saida, mixSaida, wetGain, dryHighGain, dryLowpass, wetHighpass, dryHighpass };
+}
+
+// Sobe o volume do buffer inteiro até o pico chegar em `picoAlvo` (0-1),
+// sem nunca cortar (clipping) — só ajusta se o áudio estiver baixo.
+function normalizarPico(audioBuffer, picoAlvo) {
+    let pico = 0;
+    for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
+        const dados = audioBuffer.getChannelData(c);
+        for (let i = 0; i < dados.length; i++) {
+            const abs = Math.abs(dados[i]);
+            if (abs > pico) pico = abs;
+        }
+    }
+
+    if (pico === 0 || pico >= picoAlvo) return; // já está alto o suficiente (ou é silêncio)
+
+    const ganho = picoAlvo / pico;
+    for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
+        const dados = audioBuffer.getChannelData(c);
+        for (let i = 0; i < dados.length; i++) {
+            dados[i] *= ganho;
+        }
+    }
 }
 
 // Converte um AudioBuffer estéreo (resultado do OfflineAudioContext) num Blob WAV de 16 bits.
