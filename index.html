@@ -11,17 +11,29 @@
 <div class="container">
     <h1>🎤 LouvaKaraokê</h1>
 
-    <input type="file" id="arquivo" accept="audio/*">
+    <input type="file" id="arquivo" accept="audio/*,video/*">
 
     <p id="nomeMusica">
         Nenhuma música selecionada
     </p>
 
-    <audio id="player"></audio>
+    <audio id="player" controls></audio>
 
     <button id="play">▶ Play</button>
     <button id="pause">⏸ Pause</button>
-    <button id="remover">🎙️ Remover Voz</button>
+    <button id="remover">🎙️ Ativar Efeito</button>
+
+    <div class="controle">
+        <label for="intensidade">Intensidade da remoção: <span id="valorIntensidade">0%</span></label>
+        <input type="range" id="intensidade" min="0" max="100" value="0" disabled>
+    </div>
+
+    <div class="controle">
+        <label for="graves">Proteger graves até: <span id="valorGraves">150 Hz</span></label>
+        <input type="range" id="graves" min="0" max="500" value="150" disabled>
+    </div>
+
+    <a id="download" style="display:none">⬇ Baixar sem voz</a>
 
 <p id="status">Status: Pronto.</p></div>
 
